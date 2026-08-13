@@ -15,6 +15,16 @@ Categories: `security`, `urgent`, `finance`, `travel`, `important`, `personal`, 
 
 ## Setup
 
+Two paths, same result — pick one.
+
+### Option A: Setup with the gmail-triage-setup skill (recommended)
+
+An agent does the work for you. Ask your agent to **"set up gmail-triage"** — it runs the `gmail-triage-setup` skill, which executes every shell step itself (install, OAuth URL, verify) and guides you click-by-click through the only parts that need your Google account and browser (the Google Cloud console and the auth code handoff). Requires an opencode skill runner; see [Skill (opencode)](#skill-opencode).
+
+### Option B: Manual setup
+
+Do the steps below yourself, then install the skills:
+
 ### 1. Google Cloud OAuth client (one time)
 
 1. Go to https://console.cloud.google.com/ and create a project (or reuse one).
@@ -38,6 +48,8 @@ pip install -e .
 ```bash
 gmail-triage auth-run
 ```
+
+Headless / agent-mediated alternative (no local browser): `gmail-triage auth-run --no-browser` prints a consent URL; after authorizing, finish with `gmail-triage auth-complete <code>`.
 
 Token is saved to `.gmail-triage/<account>/token.json` (`default` account unless `--account` is given). Both `credentials.json` and `.gmail-triage/` are your secrets — don't commit them.
 
