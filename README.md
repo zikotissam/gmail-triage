@@ -99,10 +99,16 @@ Precedence: `block_senders` → `allow_senders` → `block_domains` → `allow_d
 
 ## Skill (opencode)
 
-Installed at `~/.config/opencode/skills/gmail-triage/` (this repo's `skill/` is the source). To reinstall after edits:
+Two skills, sourced from this repo's `skill/`:
+
+- **gmail-triage** (source: `skill/SKILL.md` + `skill/RUBRIC.md`) — triages the inbox.
+- **gmail-triage-setup** (source: `skill/setup/SKILL.md`) — guided install, OAuth, multi-account, troubleshooting.
+
+Installed at `~/.config/opencode/skills/gmail-triage/` and `~/.config/opencode/skills/gmail-triage-setup/`. To reinstall after edits:
 
 ```bash
 cp skill/SKILL.md skill/RUBRIC.md ~/.config/opencode/skills/gmail-triage/
+cp skill/setup/SKILL.md ~/.config/opencode/skills/gmail-triage-setup/
 ```
 
 ## License

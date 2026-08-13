@@ -23,7 +23,7 @@ Run from the `gmail-triage` project dir (`C:\Users\a956064\gmail-triage`). The c
 
 ### 2. Confirm access
 
-If the account's token doesn't exist in the project dir (`.gmail-triage/default/token.json` for the default account, `.gmail-triage/<name>/token.json` otherwise), the user must run `gmail-triage auth-run` (optionally `--account <name>`) once. Check before proceeding.
+If the account's token doesn't exist in the project dir (`.gmail-triage/default/token.json` for the default account, `.gmail-triage/<name>/token.json` otherwise), the user must authenticate first. If setup, install, or auth help is needed (e.g. first-time install, adding an account, or an auth error), use the `gmail-triage-setup` skill for the full guided flow, then come back here. Check before proceeding.
 
 ### 3. Ask for flags — one question per option
 
