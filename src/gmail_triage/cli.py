@@ -85,11 +85,29 @@ def cli(ctx, account):
 
 @cli.command()
 @click.option("--client-file", type=click.Path(), default=None, help="Path to OAuth client JSON.")
+@click.option("--no-browser", is_flag=True, help="Print the auth URL to authorize manually (no auto-opened browser).")
 @click.pass_context
-def auth_run(ctx, client_file):
+def auth_run(ctx, client_file, no_browser):
     """Run the one-time OAuth flow and save token.json for an account."""
     account = ctx.obj["account"]
-    auth.get_credentials(STATE_DIR, client_file, account=account)
+    if no_browser:
+        url, state_path = auth.auth_url(STATE_DIR, client_file, account=account)
+        click.echo("\nOpen this URL in your browser and sign in with the account to add:")
+        click.echo(url)
+        click.echo("\nAfter authorizing, Google shows a verification code. Run:")
+        click.echo(f"gmail-triage --account {account} auth-complete <that-code>\n")
+    else:
+        auth.get_credentials(STATE_DIR, client_file, account=account)
+        click.echo(f"Authenticated account '{account}'. Token saved to .gmail-triage/{account}/token.json")
+
+
+@cli.command("auth-complete")
+@click.argument("code")
+@click.pass_context
+def auth_complete(ctx, code):
+    """Complete a no-browser OAuth flow with the code shown after authorization."""
+    account = ctx.obj["account"]
+    auth.finish_auth(STATE_DIR, code.strip(), account=account)
     click.echo(f"Authenticated account '{account}'. Token saved to .gmail-triage/{account}/token.json")
 
 
