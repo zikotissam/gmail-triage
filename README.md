@@ -2,6 +2,8 @@
 
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 
+![gmail-triage banner](assets/gmail-triage-banner.svg)
+
 Read your Gmail inbox **read-only** and classify messages (important, ads, security, urgent, personal, updates, other) for AI agents. Ships as a Python CLI plus an opencode skill that teaches agents how to run it and finish the LLM part of classification.
 
 ## How classification works (hybrid)
