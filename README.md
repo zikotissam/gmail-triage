@@ -55,6 +55,10 @@ gmail-triage config                                                   # merged c
 
 Use `gmail-triage classify --json` and consume the JSON. Messages with `rule_indeterminate: true` are the ones the agent must classify itself using `skill/RUBRIC.md`. The `gmail-triage` opencode skill automates this whole loop — ask your agent to "triage my inbox" and it will run it.
 
+### Harness-agnostic
+
+The CLI is a plain command that reads Gmail and emits JSON — it is **not** tied to opencode and works with any harness agent that can run a shell command (Claude Code, Codex, Cursor, custom scripts, cron, …). Only the skill wrapper is opencode-specific; it's just instructions, so port it to another harness by copying the process steps into that harness's agent prompt (e.g. `.claude/CLAUDE.md`).
+
 ## Configuration
 
 Edit `config.yml` to tune rules:
