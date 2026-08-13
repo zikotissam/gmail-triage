@@ -22,12 +22,14 @@
   <circle cx="1120" cy="120" r="260" fill="#4285F4" opacity="0.06"/>
   <circle cx="140" cy="560" r="300" fill="#EA4335" opacity="0.05"/>
 
-  <!-- envelope -->
-  <g transform="translate(220,140)" filter="url(#glow)">
-    <rect x="0" y="40" width="150" height="110" rx="14" fill="#ffffff"/>
-    <path d="M 0 40 L 75 110 L 150 40" fill="none" stroke="#EA4335" stroke-width="8" stroke-linejoin="round"/>
-    <rect x="22" y="96" width="106" height="8" rx="4" fill="#FBBC05"/>
-    <rect x="36" y="112" width="78" height="8" rx="4" fill="#4285F4"/>
+  <!-- gmail logo -->
+  <g transform="translate(215,150) scale(0.65)" filter="url(#glow)">
+    <path d="M58.1818 192.049V95.6367L0 49.4546v131.4045c0 6.1805 5.0002 11.1899 11.1812 11.1899h47.0006z" fill="#4285f4"/>
+    <path d="M197.8182 192.049V95.6367L256 49.4546v131.4045c0 6.1805-5.0002 11.1899-11.1812 11.1899h-47.0006z" fill="#ea4335"/>
+    <path d="M58.1818 95.6367L0 49.4546l58.1818-42.5454c6.3636-4.5455 15.4545-4.5455 21.8182 0L128 49.4546l48-42.5454c6.3636-4.5455 15.4545-4.5455 21.8182 0L256 49.4546l-58.1818 46.1821-69.8182 60.0001-69.8182-60.0001z" fill="#fbbc05"/>
+    <path d="M0 49.4546h58.1818v46.1821H0z" fill="#34a853"/>
+    <path d="M197.8182 49.4546H256v46.1821h-58.1818z" fill="#c5221f"/>
+    <path d="M128 105.6367L58.1818 49.4546h139.6364L128 105.6367z" fill="#ffffff"/>
   </g>
 
   <!-- title -->
