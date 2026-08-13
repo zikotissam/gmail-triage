@@ -9,9 +9,10 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
-from .models import Message
+from .models import Attachment, Message
 
-BASE_QUERY = "in:inbox"
+DEFAULT_LABEL = "in:inbox"
+META_HEADERS = ["From", "To", "Subject", "Date", "List-Unsubscribe", "Precedence", "X-Auto-Response-Suppress", "X-Feedback-ID", "X-Mailer", "Auto-Submitted"]
 
 
 def _resolve_window(since: datetime | None, until: datetime | None, hours: int | None) -> tuple[datetime | None, datetime | None]:
@@ -26,13 +27,26 @@ def _date_query(date: datetime, label: str) -> str:
     return f"{label}:{date.year}/{date.month:02d}/{date.day:02d}"
 
 
-def build_query(since: datetime | None, until: datetime | None, hours: int | None) -> tuple[str, datetime | None, datetime | None]:
+def _label_scope(label: str | None) -> str:
+    if not label:
+        return DEFAULT_LABEL
+    label = label.strip().lower()
+    if label in ("inbox", "spam", "sent", "draft", "trash", "archive", "all", "unread", "starred"):
+        return f"in:{label}" if label != "all" else "in:anywhere"
+    return f"label:{label}"
+
+
+def build_query(since: datetime | None, until: datetime | None, hours: int | None, label: str | None = None, unread_only: bool = False, extra: str | None = None) -> tuple[str, datetime | None, datetime | None]:
     since, until = _resolve_window(since, until, hours)
-    parts = [BASE_QUERY]
+    parts = [_label_scope(label)]
+    if unread_only:
+        parts.append("is:unread")
     if since:
         parts.append(_date_query(since, "after"))
     if until:
         parts.append(_date_query(until, "before"))
+    if extra and extra.strip():
+        parts.append(extra.strip())
     return " ".join(parts), since, until
 
 
@@ -40,21 +54,20 @@ class GmailClient:
     def __init__(self, creds: Credentials):
         self.service = build("gmail", "v1", credentials=creds)
 
-    def fetch(self, since: datetime | None = None, until: datetime | None = None, hours: int | None = None, max_results: int = 100, include_body: bool = False) -> list[Message]:
-        query, since, until = build_query(since, until, hours)
+    def fetch(self, since: datetime | None = None, until: datetime | None = None, hours: int | None = None, max_results: int = 100, include_body: bool = False, label: str | None = None, unread_only: bool = False, extra: str | None = None) -> list[Message]:
+        query, since, until = build_query(since, until, hours, label=label, unread_only=unread_only, extra=extra)
         messages = self.service.users().messages().list(
             userId="me", q=query, maxResults=max_results
-        ).execute().get("messages", [])
+        ).execute(num_retries=4).get("messages", [])
 
         fmt = "full" if include_body else "metadata"
-        meta_headers = ["From", "To", "Subject", "Date", "List-Unsubscribe", "Precedence", "X-Auto-Response-Suppress", "X-Feedback-ID", "X-Mailer", "Auto-Submitted"]
 
         out: list[Message] = []
         for entry in messages:
             kwargs = {"userId": "me", "id": entry["id"], "format": fmt}
             if not include_body:
-                kwargs["metadataHeaders"] = meta_headers
-            detail = self.service.users().messages().get(**kwargs).execute()
+                kwargs["metadataHeaders"] = META_HEADERS
+            detail = self.service.users().messages().get(**kwargs).execute(num_retries=4)
             msg = _parse_message(detail)
             if include_body:
                 msg.body = _extract_body(detail.get("payload", {}))
@@ -98,6 +111,27 @@ def _extract_body(payload: dict) -> str:
     return "\n".join(texts)
 
 
+def _walk_attachments(payload: dict) -> list[Attachment]:
+    out: list[Attachment] = []
+    filename = payload.get("filename")
+    if filename:
+        body = payload.get("body", {})
+        out.append(Attachment(name=filename, mime_type=payload.get("mimeType", ""), size=body.get("size")))
+    for part in payload.get("parts", []) or []:
+        out.extend(_walk_attachments(part))
+    return out
+
+
+def _parse_unsubscribe(header: str | None) -> str | None:
+    if not header:
+        return None
+    for match in re.finditer(r"<(https?://[^>]+)>", header):
+        return match.group(1)
+    for match in re.finditer(r"<mailto:[^>]+>", header):
+        return match.group(0)
+    return None
+
+
 def _parse_message(detail: dict) -> Message:
     headers: dict[str, str] = {}
     for h in detail.get("payload", {}).get("headers", []):
@@ -118,6 +152,8 @@ def _parse_message(detail: dict) -> Message:
         date=parsed_date,
         gmail_labels=detail.get("labelIds", []),
         headers=headers,
+        attachments=_walk_attachments(detail.get("payload", {})),
+        unsubscribe_url=_parse_unsubscribe(headers.get("list-unsubscribe")),
     )
 
 

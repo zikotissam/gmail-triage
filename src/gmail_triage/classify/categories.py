@@ -3,6 +3,8 @@ CANONICAL = [
     "ads",
     "security",
     "urgent",
+    "finance",
+    "travel",
     "personal",
     "updates",
     "other",

@@ -69,6 +69,12 @@ def classify_by_rules(message: Message, config: dict[str, Any]) -> tuple[str | N
     if gmail_cat == "ads":
         return "ads", [*reasons, f"gmail_label:{gmail_cat}"]
 
+    if any(k in text for k in rules.get("finance_keywords", [])):
+        return "finance", ["finance_keywords"]
+
+    if any(k in text for k in rules.get("travel_keywords", [])):
+        return "travel", ["travel_keywords"]
+
     if any(k in text for k in rules["urgent_keywords"]):
         return "urgent", ["urgent_keywords"]
 

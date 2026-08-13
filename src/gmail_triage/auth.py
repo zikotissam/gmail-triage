@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+from typing import Any
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -18,14 +19,15 @@ def credentials_path(state_dir: Path) -> Path:
     return in_state
 
 
-def token_path(state_dir: Path) -> Path:
-    return state_dir / "token.json"
+def token_path(state_dir: Path, account: str = "default") -> Path:
+    return state_dir / account / "token.json"
 
 
-def get_credentials(state_dir: Path, client_file: str | None = None) -> Credentials:
+def get_credentials(state_dir: Path, client_file: str | None = None, account: str = "default") -> Any:
     state_dir.mkdir(parents=True, exist_ok=True)
     creds_path = credentials_path(state_dir)
-    tok_path = token_path(state_dir)
+    tok_path = token_path(state_dir, account)
+    tok_path.parent.mkdir(parents=True, exist_ok=True)
 
     if client_file:
         creds_path = Path(client_file)

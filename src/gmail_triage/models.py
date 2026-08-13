@@ -5,6 +5,13 @@ from datetime import datetime
 
 
 @dataclass
+class Attachment:
+    name: str
+    mime_type: str
+    size: int | None = None
+
+
+@dataclass
 class Message:
     id: str
     thread_id: str
@@ -17,9 +24,15 @@ class Message:
     gmail_labels: list[str] = field(default_factory=list)
     headers: dict[str, str] = field(default_factory=dict)
     body: str = ""
+    attachments: list[Attachment] = field(default_factory=list)
+    unsubscribe_url: str | None = None
 
     def header(self, name: str) -> str | None:
         return self.headers.get(name)
+
+    @property
+    def is_unread(self) -> bool:
+        return "UNREAD" in self.gmail_labels
 
     def to_features(self, include_body: bool = False) -> dict:
         out = {
@@ -31,7 +44,18 @@ class Message:
             "subject": self.subject,
             "snippet": self.snippet,
             "date": self.date.isoformat() if self.date else None,
+            "is_unread": self.is_unread,
             "gmail_labels": self.gmail_labels,
+            "has_attachment": bool(self.attachments),
+            "attachments": [
+                {
+                    "name": a.name,
+                    "mime_type": a.mime_type,
+                    "size": a.size,
+                }
+                for a in self.attachments
+            ],
+            "unsubscribe_url": self.unsubscribe_url,
             "headers": {
                 k: v
                 for k, v in self.headers.items()

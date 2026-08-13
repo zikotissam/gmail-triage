@@ -3,6 +3,8 @@ categories:
   ads: "Marketing, promotions, offers, deals"
   security: "Password resets, login alerts, 2FA codes, security notifications"
   urgent: "Time-sensitive messages with deadlines or immediate action"
+  finance: "Receipts, invoices, billing, statements, payment confirmations"
+  travel: "Flights, bookings, check-in, hotels, trip reservations"
   personal: "Messages from people you know, personal correspondence"
   updates: "Newsletters, product updates, notifications, receipts"
   other: "Everything that doesn't fit above"
@@ -28,6 +30,28 @@ rules:
     - "action required"
     - "immediately"
     - "expires"
+  finance_keywords:
+    - "invoice"
+    - "receipt"
+    - "payment"
+    - "billing"
+    - "statement"
+    - "charge"
+    - "tax"
+    - "refund"
+    - "subscription fee"
+    - "order confirmation"
+  travel_keywords:
+    - "flight"
+    - "boarding pass"
+    - "check-in"
+    - "hotel"
+    - "booking"
+    - "itinerary"
+    - "reservation"
+    - "airline"
+    - "departure"
+    - "trip"
   allow_senders: {}
   block_senders: {}
   allow_domains: []

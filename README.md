@@ -4,12 +4,14 @@
 
 ![gmail-triage banner](assets/gmail-triage-banner.svg)
 
-Read your Gmail inbox **read-only** and classify messages (important, ads, security, urgent, personal, updates, other) for AI agents. Ships as a Python CLI plus an opencode skill that teaches agents how to run it and finish the LLM part of classification.
+Read your Gmail inbox **read-only** and classify messages (important, ads, security, urgent, finance, travel, personal, updates, other) for AI agents. Ships as a Python CLI plus an opencode skill that teaches agents how to run it and finish the LLM part of classification.
 
 ## How classification works (hybrid)
 
-1. **Deterministic rules (CLI):** Gmail's native category labels, bulk headers (`List-Unsubscribe`, `Precedence: bulk`), security/urgency keywords, and your allow/block lists in `config.yml`.
+1. **Deterministic rules (CLI):** Gmail's native category labels, bulk headers (`List-Unsubscribe`, `Precedence: bulk`), security/urgency/finance/travel keywords, and your allow/block lists in `config.yml`.
 2. **LLM pass (agent):** messages the rules can't resolve (`rule_indeterminate: true`) are classified by the agent using the rubric in `skill/RUBRIC.md`. No API key needed — the agent is the LLM.
+
+Categories: `security`, `urgent`, `finance`, `travel`, `important`, `personal`, `updates`, `ads`, `other`.
 
 ## Setup
 
@@ -37,21 +39,39 @@ pip install -e .
 gmail-triage auth-run
 ```
 
-Token is saved to `.gmail-triage/token.json`. Both `credentials.json` and `.gmail-triage/` are your secrets — don't commit them.
+Token is saved to `.gmail-triage/<account>/token.json` (`default` account unless `--account` is given). Both `credentials.json` and `.gmail-triage/` are your secrets — don't commit them.
+
+### Multi-account
+
+Each account gets its own token under `.gmail-triage/<name>/`. Auth and read:
+
+```bash
+gmail-triage auth-run --account work          # first time per account
+gmail-triage classify --account work --hours 24
+```
 
 ## Usage
 
 ```bash
-# All fetch/classify/report commands support date filters:
-gmail-triage inbox   --since 2026-01-01 --until 2026-02-01 --json   # full window
+# All fetch/classify/report commands support these flags:
+gmail-triage inbox    --since 2026-01-01 --until 2026-02-01 --json   # full window
 gmail-triage classify --hours 24 --json                              # last 24h (agent-facing)
-gmail-triage report  --since 2026-07-01                               # human digest
+gmail-triage report   --since 2026-07-01 --format md                 # markdown digest
 gmail-triage config                                                   # merged config
 ```
 
-- `--since`/`--until` are ISO dates (`YYYY-MM-DD`); they map to Gmail's `after:`/`before:` queries (server-side filtering).
-- `--hours N` is a shortcut and is mutually exclusive with `--since`/`--until`.
-- `--limit` caps results (default 100).
+- `--since`/`--until` — ISO dates (`YYYY-MM-DD`); map to Gmail `after:`/`before:` (server-side filtering). `before:` is exclusive, so to include a day use the next day as `--until`.
+- `--hours N` — shortcut; mutually exclusive with `--since`/`--until`.
+- `--limit N` — caps results (default 100).
+- `--full` — fetch full message bodies (default: snippet only).
+- `--unread` — only unread messages (`is:unread`).
+- `--label <name>` — scope: `inbox` (default), `spam`, `sent`, `draft`, `trash`, `archive`, `all`, `unread`, `starred`, or a custom label.
+- `--query "<terms>"` — extra Gmail search terms, e.g. `from:paypal has:attachment`.
+- `--account <name>` — which account to use (multi-account).
+- `--format {text|md}` — report output format.
+- `--no-collapse` — report flat message list instead of collapsing threads.
+
+Every message's JSON features include: `is_unread`, `has_attachment`, `attachments` (name/mime/size), and `unsubscribe_url` (parsed from `List-Unsubscribe`).
 
 ### For an AI agent
 
@@ -65,12 +85,12 @@ The CLI is a plain command that reads Gmail and emits JSON — it is **not** tie
 
 Edit `config.yml` to tune rules:
 
-- `rules.security_keywords` / `rules.urgent_keywords` — keyword lists.
+- `rules.security_keywords` / `rules.urgent_keywords` / `rules.finance_keywords` / `rules.travel_keywords` — keyword lists.
 - `rules.allow_senders` — map `email -> category` (e.g. `boss@work.com: important`).
 - `rules.block_senders` — map `email` (or subject pattern) `-> category` (e.g. `deals@shop.com: ads`).
 - `rules.allow_domains` / `rules.block_domains` — whole-domain rules.
 
-Precedence: `block_senders` → `allow_senders` → `block_domains` → `allow_domains` → security keywords → ads label → urgent keywords → bulk/updates.
+Precedence: `block_senders` → `allow_senders` → `block_domains` → `allow_domains` → security keywords → ads label → finance → travel → urgent keywords → bulk/updates.
 
 ## Safety
 
