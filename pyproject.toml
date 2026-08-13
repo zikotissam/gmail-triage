@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gmail-triage"
+version = "0.1.0"
+description = "Read Gmail inbox read-only and classify messages for AI agents."
+requires-python = ">=3.11"
+dependencies = [
+    "google-api-python-client>=2.120",
+    "google-auth-oauthlib>=1.2",
+    "google-auth-httplib2>=0.1",
+    "click>=8.1",
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+gmail-triage = "gmail_triage.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]

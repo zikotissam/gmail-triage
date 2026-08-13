@@ -1,0 +1,40 @@
+categories:
+  important: "High-priority messages that genuinely need attention"
+  ads: "Marketing, promotions, offers, deals"
+  security: "Password resets, login alerts, 2FA codes, security notifications"
+  urgent: "Time-sensitive messages with deadlines or immediate action"
+  personal: "Messages from people you know, personal correspondence"
+  updates: "Newsletters, product updates, notifications, receipts"
+  other: "Everything that doesn't fit above"
+
+rules:
+  security_keywords:
+    - "verify your identity"
+    - "sign-in attempt"
+    - "new device"
+    - "security alert"
+    - "password"
+    - "verification code"
+    - "authentication"
+    - "unusual activity"
+    - "account locked"
+    - "reset your password"
+  urgent_keywords:
+    - "urgent"
+    - "asap"
+    - "deadline"
+    - "today"
+    - "by eod"
+    - "action required"
+    - "immediately"
+    - "expires"
+  allow_senders: {}
+  block_senders: {}
+  allow_domains: []
+  block_domains: []
+
+labels:
+  ads:
+    - "CATEGORY_PROMOTIONS"
+  updates:
+    - "CATEGORY_UPDATES"
