@@ -15,10 +15,10 @@ Read your Gmail inbox **read-only** and classify messages (important, ads, secur
 
 1. Go to https://console.cloud.google.com/ and create a project (or reuse one).
 2. **Enable the Gmail API** (APIs & Services → Library → "Gmail API" → Enable).
-3. **Configure the OAuth consent screen** (APIs & Services → OAuth consent screen):
-   - User type: **External** (fine for personal use).
-   - Add your Google account as a **test user**.
-   - Scopes: add `https://www.googleapis.com/auth/gmail.readonly` (read-only!).
+3. **Configure the OAuth consent screen** (APIs & Services → **Google Auth Platform** — this is what "OAuth consent screen" is now called):
+   - **Audience** tab → **User type:** **External** (fine for personal use).
+   - **Audience** tab → **Test users → Add users**: add the Google account you'll authorize with. **Required** — while the app is in *Testing* status, any account not listed here gets a `403 access_denied` when authorizing.
+   - Scopes: add `https://www.googleapis.com/auth/gmail.readonly` (read-only!). Scopes are now configured per OAuth client under the **Clients** tab.
 4. **Create OAuth client ID** (APIs & Services → Credentials → Create Credentials → OAuth client ID):
    - Application type: **Desktop app**.
    - Download the JSON and save it as `credentials.json` in this project dir.
